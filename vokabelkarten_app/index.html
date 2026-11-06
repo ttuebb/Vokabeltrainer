@@ -48,6 +48,22 @@
     .secondary{background:white;color:var(--blue);border:1px solid #cfdaed}
     .secondary:hover{background:#eef4ff}
     .actions button{flex:1;max-width:250px}
+    .challenge{max-width:640px;margin:0 auto 20px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px 20px}
+    .challenge-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .challenge-title{font-weight:750;font-size:16px}
+    .challenge-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:15px}
+    .stat{background:#f5f8fd;border-radius:12px;padding:11px 9px;text-align:center}
+    .stat strong{display:block;font-size:24px;font-variant-numeric:tabular-nums}.stat span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+    .progress-track{background:#e7edf6;border-radius:20px;height:10px;overflow:hidden;margin-top:14px}
+    .progress-fill{background:#2d9f77;height:100%;width:0;transition:width .2s}
+    .challenge-note{font-size:12px;color:var(--muted);margin:9px 0 0;line-height:1.5}
+    .answer-actions{display:flex;gap:10px;margin:0 auto 12px;justify-content:center}
+    .answer-actions button{flex:1;max-width:250px;min-height:46px;border-radius:12px;font-weight:700;border:1px solid #d0dded;background:white;color:#284e83}
+    .answer-actions .known{background:#e6f6ed;border-color:#a3ddbd;color:#176a43}
+    .answer-actions button:disabled{opacity:.45;cursor:default}
+    .remove-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 auto 12px}
+    .remove-btn{border:1px solid #efc9c9;background:#fff8f8;color:#933636;padding:10px 14px;border-radius:11px;font-weight:650;font-size:13px}
+    .remove-btn:hover{background:#ffebeb}
     .footnote{text-align:center;color:var(--muted);font-size:13px;line-height:1.45}
     .panel{max-width:640px;margin:31px auto 0;background:rgba(255,255,255,.83);border:1px solid var(--line);border-radius:20px;padding:19px 22px}
     .panel-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -82,7 +98,7 @@
       <div class="identity"><div class="logo" aria-hidden="true">A↔</div><div><div class="head-title">Vokabelkarten</div><div class="subtitle">Italiano · Deutsch</div></div></div>
       <div class="pill" id="count">0 Vokabeln</div>
     </header>
-    <section class="top"><h1>Ein Wort nach dem anderen.</h1><p class="lead">Antippen oder Return drücken: Übersetzung sehen, nächste Karte. Ohne Anmeldung.</p></section>
+    <section class="top"><h1>Ein Wort nach dem anderen.</h1><p class="lead">Return: Lösung / nächste Karte. Leertaste: Wort entfernen. Nach der Lösung: Gewusst / Nicht gewusst.</p></section>
     <div class="settings">
       <label class="setting">Abfragerichtung
         <select id="direction"><option value="it-de">Italienisch → Deutsch</option><option value="de-it">Deutsch → Italienisch</option></select>
@@ -91,6 +107,12 @@
         <select id="mode"><option value="random">Zufällig, mit Wiederholungen</option><option value="cycle">Alle einmal, dann neu mischen</option></select>
       </label>
     </div>
+    <section class="challenge" aria-label="Tages-Challenge">
+      <div class="challenge-head"><div class="challenge-title">🎯 Deine Tages-Challenge</div><label class="setting">Tagesziel <select id="dailyGoal"><option value="10">10 Wörter</option><option value="20" selected>20 Wörter</option><option value="30">30 Wörter</option><option value="50">50 Wörter</option></select></label></div>
+      <div class="challenge-stats"><div class="stat"><strong id="todayCorrect">0/20</strong><span>Heute gewusst</span></div><div class="stat"><strong id="correctRun">0</strong><span>Richtig in Folge</span></div><div class="stat"><strong id="dayRun">0</strong><span>Lerntage in Folge</span></div></div>
+      <div class="progress-track" role="progressbar" id="dailyProgress" aria-label="Tagesziel" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0"><div class="progress-fill" id="dailyFill"></div></div>
+      <p class="challenge-note" id="challengeNote" aria-live="polite">Lösung ansehen, dann „Gewusst“ oder „Nicht gewusst“ wählen. Nur ehrlich bewertete Antworten zählen.</p>
+    </section>
     <section class="deck-card" aria-label="Vokabeltraining">
       <div class="empty" id="empty">
         <div class="empty-icon" aria-hidden="true">📚</div>
@@ -107,12 +129,14 @@
           </div>
         </div>
         <div class="actions"><button class="secondary" id="showAnswer">Übersetzung zeigen</button><button class="primary" id="next">Nächste Vokabel →</button></div>
+        <div class="answer-actions"><button class="known" id="known" disabled>✓ Gewusst</button><button id="missed" disabled>× Nicht gewusst</button></div>
+        <div class="remove-actions"><button class="remove-btn" id="remove">Wort entfernen · Leertaste</button></div>
         <div class="footnote" id="status" aria-live="polite">Zufällige Reihenfolge</div>
       </div>
     </section>
     <section class="panel">
-      <div class="panel-head"><h2 class="panel-title">Meine Vokabelliste</h2><div class="panel-actions"><button class="small-btn" id="openEdit">Liste bearbeiten</button><button class="small-btn" id="importBtn">Datei importieren</button><button class="small-btn" id="exportBtn">Exportieren</button></div></div>
-      <p class="panel-text">Pro Zeile <code>italienisch; deutsch</code>. Die Wörter bleiben auf diesem Gerät im verwendeten Browser gespeichert. Eine automatische Synchronisierung zwischen Geräten gibt es nicht.</p>
+      <div class="panel-head"><h2 class="panel-title">Meine Vokabelliste</h2><div class="panel-actions"><button class="small-btn" id="undo" hidden>Letztes Wort zurückholen</button><button class="small-btn" id="openEdit">Liste bearbeiten</button><button class="small-btn" id="importBtn">Datei importieren</button><button class="small-btn" id="exportBtn">Exportieren</button></div></div>
+      <p class="panel-text">Pro Zeile <code>italienisch; deutsch</code>. Die Wörter bleiben auf diesem Gerät im verwendeten Browser gespeichert. Auch Challenge-Fortschritt und Erfolgsserien werden lokal gespeichert. Keine automatische Synchronisierung.</p>
     </section>
     <input class="sr-only" type="file" id="file" accept=".txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values" aria-label="Vokabeldatei auswählen">
   </main>
@@ -131,6 +155,7 @@
   (() => {
     'use strict';
     const KEY = 'vokabelkarten.cards.v1';
+    const CHALLENGE_KEY = 'vokabelkarten.challenge.v1';
     const OPTIONS_KEY = 'vokabelkarten.settings.v1';
     const $ = id => document.getElementById(id);
     let cards = [];
@@ -138,6 +163,37 @@
     let revealed = false;
     let queue = [];
     let showingSample = false;
+    let lastRemoved = null;
+    let assessed = false;
+    const initialChallenge={goal:20,history:{},correctRun:0,lastPracticeDay:null};
+    let challenge=initialChallenge;
+    function localDay(date=new Date()){const y=date.getFullYear(),m=String(date.getMonth()+1).padStart(2,'0'),d=String(date.getDate()).padStart(2,'0');return `${y}-${m}-${d}`;}
+    function yesterday(day){const [y,m,d]=day.split('-').map(Number);const z=new Date(y,m-1,d);z.setDate(z.getDate()-1);return localDay(z);}
+    function todayData(){const d=localDay();return challenge.history[d]||{correct:0,attempts:0};}
+    function consecutiveDays(){let d=localDay();if(!challenge.history[d]?.attempts)d=yesterday(d);let run=0;while(challenge.history[d]?.attempts>0){run++;d=yesterday(d);}return run;}
+    function saveChallenge(){storageSet(CHALLENGE_KEY,challenge);}
+    function renderChallenge(){
+      const day=localDay();const today=todayData();const goal=challenge.goal;
+      $('dailyGoal').value=String(goal);
+      $('todayCorrect').textContent=`${today.correct}/${goal}`;
+      $('correctRun').textContent=challenge.correctRun;
+      $('dayRun').textContent=consecutiveDays();
+      $('dailyFill').style.width=Math.min(100,100*today.correct/goal)+'%';
+      $('dailyProgress').setAttribute('aria-valuemax',goal);
+      $('dailyProgress').setAttribute('aria-valuenow',Math.min(today.correct,goal));
+      $('challengeNote').textContent=today.correct>=goal?'🏆 Tagesziel geschafft! Du kannst natürlich weiterüben.':`${Math.max(0,goal-today.correct)} richtig erinnerte Wörter bis zum Tagesziel · ${today.attempts} Bewertungen heute.`;
+    }
+    function rate(correct){
+      if(!cards.length||!revealed||assessed)return;
+      const day=localDay();const yesterdayDay=yesterday(day);
+      if(challenge.lastPracticeDay!==day && challenge.lastPracticeDay!==yesterdayDay)challenge.correctRun=0;
+      if(!challenge.history[day])challenge.history[day]={correct:0,attempts:0};
+      challenge.history[day].attempts++;
+      if(correct){challenge.history[day].correct++;challenge.correctRun++;}
+      else challenge.correctRun=0;
+      challenge.lastPracticeDay=day;assessed=true;
+      saveChallenge();renderChallenge();advance();
+    }
     const samples = [['la casa','das Haus'],['andare','gehen'],['il libro','das Buch'],['rendersi conto di','bemerken, erkennen'],['avere bisogno di','brauchen'],['comunque','jedenfalls, trotzdem']];
 
     function storageGet(key, fallback){ try { const s = localStorage.getItem(key); return s === null ? fallback : JSON.parse(s); } catch { return fallback; } }
@@ -164,6 +220,8 @@
       $('empty').hidden=cards.length>0;
       $('training').hidden=cards.length===0;
       $('exportBtn').disabled=cards.length===0;
+      $('undo').hidden=!lastRemoved;
+      renderChallenge();
       if(cards.length===0)return;
       if(current<0||current>=cards.length)current=chooseNext();
       const [it,de]=cards[current];
@@ -175,9 +233,28 @@
       $('card').classList.toggle('flipped',revealed);
       $('showAnswer').textContent=revealed?'Antwort sichtbar':'Übersetzung zeigen';
       $('showAnswer').disabled=revealed;
+      $('known').disabled=!revealed||assessed;
+      $('missed').disabled=!revealed||assessed;
       $('status').textContent=showingSample?'Beispielwörter · eigene Liste ersetzt das Beispiel':$('mode').value==='cycle'?'Alle Wörter einmal, danach neu gemischt':'Zufallsauswahl ohne direktes Wiederholen';
     }
-    function advance(){if(!cards.length)return;const ix=chooseNext();current=ix;revealed=false;render();}
+    function removeCurrent(){
+      if(!cards.length||current<0)return;
+      const index=current;
+      lastRemoved={word:[...cards[index]],index};
+      cards.splice(index,1);
+      showingSample=false;
+      current=-1;revealed=false;assessed=false;resetQueue();
+      if(!storageSet(KEY,cards))alert('Die Änderung konnte nicht dauerhaft gespeichert werden.');
+      render();
+    }
+    function undoRemove(){
+      if(!lastRemoved)return;
+      cards.splice(Math.min(lastRemoved.index,cards.length),0,lastRemoved.word);
+      lastRemoved=null;current=-1;revealed=false;assessed=false;resetQueue();
+      if(!storageSet(KEY,cards))alert('Die Änderung konnte nicht dauerhaft gespeichert werden.');
+      render();
+    }
+    function advance(){if(!cards.length)return;const ix=chooseNext();current=ix;revealed=false;assessed=false;render();}
     function flip(){if(!cards.length)return;if(revealed)advance();else{revealed=true;render();}}
     function parseLine(line){
       const s=line.trim().replace(/^[-*•]\s+/, '');
@@ -221,8 +298,8 @@
       const parsed=parseText($('words').value);
       if(parsed.invalid.length){$('parseNotice').textContent=parsed.invalid.length+' Zeile(n) nicht erkannt. Bitte jede Zeile durch Semikolon trennen. Erste fehlerhafte Zeile: '+parsed.invalid[0].slice(0,85);return;}
       cards=parsed.result;
-      showingSample=false;
-      current=-1;revealed=false;resetQueue();
+      showingSample=false;lastRemoved=null;
+      current=-1;revealed=false;assessed=false;resetQueue();
       const ok=storageSet(KEY,cards);
       closeEditor();render();
       if(!ok)alert('Hinweis: Die Wörter konnten nicht dauerhaft im Browser gespeichert werden. Bitte als Textdatei exportieren.');
@@ -247,7 +324,7 @@
           $('words').value=parsed.result.map(c=>c.join('; ')).join('\n');
           $('parseNotice').textContent='Datei bereit: '+file.name+'. Mit „Liste übernehmen“ speichern.';
         } else {
-          cards=parsed.result;showingSample=false;current=-1;revealed=false;resetQueue();
+          cards=parsed.result;showingSample=false;lastRemoved=null;current=-1;revealed=false;resetQueue();
           if(!storageSet(KEY,cards))alert('Die Datei wurde geladen, aber der Browser konnte sie nicht dauerhaft speichern. Bitte exportieren.');
           render();
         }
@@ -255,14 +332,19 @@
       finally{event.target.value='';}
     }
     $('card').addEventListener('click',flip);
-    $('card').addEventListener('keydown',e=>{if(e.key===' '){e.preventDefault();flip();}});
+
     $('showAnswer').addEventListener('click',()=>{revealed=true;render();});
     $('next').addEventListener('click',advance);
+    $('remove').addEventListener('click',removeCurrent);
+    $('known').addEventListener('click',()=>rate(true));
+    $('missed').addEventListener('click',()=>rate(false));
+    $('dailyGoal').addEventListener('change',()=>{challenge.goal=Number($('dailyGoal').value);saveChallenge();renderChallenge();});
+    $('undo').addEventListener('click',undoRemove);
     $('direction').addEventListener('change',()=>{revealed=false;storageSet(OPTIONS_KEY,getOptions());render();});
     $('mode').addEventListener('change',()=>{resetQueue();storageSet(OPTIONS_KEY,getOptions());render();});
     $('startEdit').addEventListener('click',openEditor);
     $('openEdit').addEventListener('click',openEditor);
-    $('sample').addEventListener('click',()=>{cards=samples.map(c=>[...c]);showingSample=true;current=-1;revealed=false;resetQueue();render();});
+    $('sample').addEventListener('click',()=>{cards=samples.map(c=>[...c]);showingSample=true;lastRemoved=null;current=-1;revealed=false;resetQueue();render();});
     $('importBtn').addEventListener('click',()=>$('file').click());
     $('fileInside').addEventListener('click',()=>$('file').click());
     $('file').addEventListener('change',handleFile);
@@ -280,13 +362,27 @@
       e.stopPropagation();
       if(!e.repeat)flip();
     },true);
+    // Leertaste entfernt die aktuelle Vokabel – auch wenn ein Button oder
+    // die Karte noch den Tastaturfokus hat. Formulare bleiben unbeeinflusst.
     document.addEventListener('keydown',e=>{
-      if($('editor').open||e.altKey||e.ctrlKey||e.metaKey||['BUTTON','SELECT','INPUT','TEXTAREA'].includes(document.activeElement?.tagName)||document.activeElement===$('card'))return;
-      if(e.key===' '){e.preventDefault();flip();}
-      else if(e.key==='ArrowRight'){e.preventDefault();advance();}
+      if(e.key!==' '&&e.code!=='Space')return;
+      if($('editor').open||$('training').hidden||e.altKey||e.ctrlKey||e.metaKey)return;
+      if(['INPUT','TEXTAREA','SELECT'].includes(e.target?.tagName)||e.target?.isContentEditable)return;
+      e.preventDefault();e.stopPropagation();
+      if(!e.repeat)removeCurrent();
+    },true);
+    document.addEventListener('keydown',e=>{
+      if($('editor').open||e.altKey||e.ctrlKey||e.metaKey||['SELECT','INPUT','TEXTAREA'].includes(e.target?.tagName)||e.target?.isContentEditable)return;
+      if(e.key==='ArrowRight'){e.preventDefault();advance();}
     });
     const stored=storageGet(KEY,[]);
     if(Array.isArray(stored))cards=stored.filter(c=>Array.isArray(c)&&c.length===2&&typeof c[0]==='string'&&typeof c[1]==='string'&&c[0]&&c[1]);
+    const savedChallenge=storageGet(CHALLENGE_KEY,initialChallenge);
+    if(savedChallenge && typeof savedChallenge==='object'){
+      challenge={...initialChallenge,...savedChallenge,history:(savedChallenge.history&&typeof savedChallenge.history==='object')?savedChallenge.history:{}};
+      if(![10,20,30,50].includes(challenge.goal))challenge.goal=20;
+      if(!Number.isSafeInteger(challenge.correctRun)||challenge.correctRun<0)challenge.correctRun=0;
+    }
     const opts=storageGet(OPTIONS_KEY,{});
     if(opts.direction==='de-it')$('direction').value='de-it';
     if(opts.mode==='cycle')$('mode').value='cycle';

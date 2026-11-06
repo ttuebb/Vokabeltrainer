@@ -1,52 +1,14 @@
-VOKABELKARTEN – ANLEITUNG
-========================
+VOKABELTRAINER – CHALLENGE-VERSION
 
-EINGABE
-Eine Zeile pro Vokabel, italienisch und deutsch getrennt durch ein Semikolon:
-la casa; das Haus
-andare; gehen
-comunque; jedenfalls, trotzdem
+Öffnen: index.html im Browser; auf GitHub Pages als Web-App verwendbar.
 
-Dateitypen: .txt, .csv, .tsv. Du kannst die Liste auch direkt in die App einfügen.
-Eine Datei wird beim Import als neue gesamte Liste übernommen (nicht angehängt).
-
-LINUX
-Einfach index.html in Firefox oder Chrome öffnen. Eine Installation ist nicht nötig.
-
-MAC
-index.html in Safari, Firefox oder Chrome öffnen.
-
-IPHONE / IPAD
-Für eine zuverlässige App auf dem Home-Bildschirm müssen diese Dateien auf einer
-HTTPS-Webadresse veröffentlicht werden (z. B. kostenlos mit GitHub Pages).
-Dann:
-  1. Website auf iPhone/iPad in Safari öffnen.
-  2. Teilen -> Zum Home-Bildschirm -> Hinzufügen.
-  3. Danach funktioniert die App auch ohne Internet (sobald sie einmal geladen wurde).
-
-Hinweis: Das reine Öffnen einer lokal gespeicherten HTML-Datei aus der iOS-Dateien-App
-funktioniert je nach iOS-Version nur eingeschränkt. Für iPhone/iPad ist deshalb die
-Variante über eine HTTPS-Webadresse zu bevorzugen.
-
-BEDIENUNG
-- Einmal auf die Karte tippen: Übersetzung zeigen.
-- Zweimal tippen (zweites Antippen): nächstes zufälliges Wort.
-- Auch die Schaltflächen unten funktionieren.
-- Auf einer Tastatur: 1× Return/Enter = Übersetzung zeigen,
-  erneut Return/Enter = nächste Karte. Das funktioniert auch nach einem Mausklick
-  auf eine der Schaltflächen. Leertaste auf der Karte funktioniert ebenfalls.
-  Pfeil rechts = nächste Karte.
-- Standard: Zufällige Auswahl mit Wiederholungen, nicht zweimal direkt hintereinander.
-- Optional: Alle Vokabeln einmal in zufälliger Reihenfolge, dann erneut mischen.
-- Optional: Deutsch -> Italienisch.
-
-DATEN
-Die Liste wird lokal im Speicher des jeweiligen Browsers gesichert, sofern dessen
-Datenspeicherung aktiv ist. Es werden keine Dateien hochgeladen, kein Nutzerkonto
-und keine Internetverbindung zur Abfrage benötigt.
-Es gibt KEINE Synchronisierung zwischen Geräten. Verwende Exportieren und importiere
-die gleiche TXT-Datei bei Bedarf auf dem anderen Gerät. Private-Browsing-Modus
-oder das Löschen der Websitedaten kann die gespeicherte Liste entfernen.
-
-Die Dateien index.html, sw.js, manifest.webmanifest und icons/ gehören zusammen,
-wenn du die App auf einer Website installierbar machen möchtest.
+Return: Lösung anzeigen / nächste Karte.
+Leertaste: Wort aus der aktuellen Liste entfernen.
+Nach dem Aufdecken: „Gewusst“ oder „Nicht gewusst“ anklicken.
+Nur diese Bewertungen zählen für das Tagesziel und die Erfolgsserie.
+Tagesziel: 10, 20, 30 oder 50 gewusste Antworten.
+„Richtig in Folge“ zählt aufeinanderfolgende richtige Bewertungen und wird bei einer falschen Antwort zurückgesetzt.
+„Lerntage in Folge“ zählt Kalendertage mit mindestens einer Bewertung.
+Import: Italienisch; Deutsch – pro Zeile eine Vokabel.
+Daten bleiben im Browser gespeichert. Dateien regelmäßig exportieren.
+GitHub-Update: Inhalt des Ordners vokabelkarten_app in den bestehenden GitHub-Unterordner vokabelkarten_app hochladen, dort bestehende Dateien ersetzen.
