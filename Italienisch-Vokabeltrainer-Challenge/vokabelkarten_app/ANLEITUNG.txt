@@ -1,0 +1,14 @@
+VOKABELTRAINER – CHALLENGE-VERSION
+
+Öffnen: index.html im Browser; auf GitHub Pages als Web-App verwendbar.
+
+Return: Lösung anzeigen / nächste Karte.
+Leertaste: Wort aus der aktuellen Liste entfernen.
+Nach dem Aufdecken: „Gewusst“ oder „Nicht gewusst“ anklicken.
+Nur diese Bewertungen zählen für das Tagesziel und die Erfolgsserie.
+Tagesziel: 10, 20, 30 oder 50 gewusste Antworten.
+„Richtig in Folge“ zählt aufeinanderfolgende richtige Bewertungen und wird bei einer falschen Antwort zurückgesetzt.
+„Lerntage in Folge“ zählt Kalendertage mit mindestens einer Bewertung.
+Import: Italienisch; Deutsch – pro Zeile eine Vokabel.
+Daten bleiben im Browser gespeichert. Dateien regelmäßig exportieren.
+GitHub-Update: Inhalt des Ordners vokabelkarten_app in den bestehenden GitHub-Unterordner vokabelkarten_app hochladen, dort bestehende Dateien ersetzen.
