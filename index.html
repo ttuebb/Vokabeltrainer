@@ -118,8 +118,18 @@
       </div>
     </section>
     <section class="panel">
-      <div class="panel-head"><h2 class="panel-title">Meine Vokabelliste</h2><div class="panel-actions"><button class="small-btn" id="importBtn">Datei importieren</button><button class="small-btn" id="exportBtn">Exportieren</button><button class="small-btn" id="restart">Training neu starten</button></div></div>
-      <p class="panel-text">Die Vokabelliste ist zunächst leer und wird ausschließlich durch Dateiimport gefüllt. Importierte Vokabeln und Lernfortschritt werden lokal in diesem Browser gespeichert.</p>
+      <div class="panel-head"><h2 class="panel-title">Meine Vokabelliste</h2><div class="panel-actions"><button class="small-btn" id="editBtn">Vokabeln bearbeiten</button><button class="small-btn" id="importBtn">Datei importieren</button><button class="small-btn" id="exportBtn">Exportieren</button><button class="small-btn" id="restart">Training neu starten</button></div></div>
+      <p class="panel-text">Die Vokabelliste startet leer. Du kannst Vokabeln per Datei importieren oder über „Vokabeln bearbeiten“ einfügen und ändern. Alles wird lokal im Browser gespeichert.</p>
+    </section>
+    <section class="panel" id="editorPanel" hidden aria-label="Vokabeln bearbeiten">
+      <div class="panel-head"><h2 class="panel-title">Vokabeln bearbeiten</h2></div>
+      <p class="panel-text">Füge deine Vokabeln per Copy &amp; Paste ein, eine pro Zeile: <strong>Italienisch; Deutsch</strong> (auch Tabulator, Komma oder Gedankenstrich möglich). Du kannst die vorhandenen Einträge hier ändern oder ergänzen.</p>
+      <textarea id="vocabEditor" spellcheck="false" placeholder="andare; gehen&#10;rendersi conto; bemerken"></textarea>
+      <p class="panel-text" id="editorMessage" aria-live="polite"></p>
+      <div class="panel-actions" style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="primary" id="saveEditor">Vokabelliste speichern</button>
+        <button class="secondary" id="cancelEditor">Abbrechen</button>
+      </div>
     </section>
     <input class="sr-only" type="file" id="file" accept=".txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values" aria-label="Vokabeldatei auswählen">
   </main>
@@ -204,6 +214,13 @@
       return {result,invalid};
     }
     function useList(list){cards=list;showingSample=false;resetProgress()}
+    function openEditor(){
+      $('vocabEditor').value=cards.map(([it,de])=>it+'; '+de).join('\n');
+      $('editorMessage').textContent='';
+      $('editorPanel').hidden=false;
+      $('editorPanel').scrollIntoView({behavior:'smooth',block:'start'});
+      $('vocabEditor').focus();
+    }
     function download(){
       const content='\uFEFF'+cards.map(([it,de])=>it+'; '+de).join('\n')+'\n';
       const url=URL.createObjectURL(new Blob([content],{type:'text/plain;charset=utf-8'}));
@@ -222,8 +239,18 @@
     $('confirm').addEventListener('click',confirm);
     $('unknown').addEventListener('click',unknown);
     $('direction').addEventListener('change',()=>{revealed=false;storageSet(OPTIONS_KEY,{direction:$('direction').value});render()});
-    $('startEdit').addEventListener('click',()=>$('file').click());
+    $('startEdit').addEventListener('click',openEditor);
     $('importBtn').addEventListener('click',()=>$('file').click());
+    $('editBtn').addEventListener('click',openEditor);
+    $('cancelEditor').addEventListener('click',()=>{$('editorPanel').hidden=true});
+    $('saveEditor').addEventListener('click',()=>{
+      const parsed=parseText($('vocabEditor').value);
+      if(parsed.invalid.length){$('editorMessage').textContent=parsed.invalid.length+' Zeile(n) nicht erkannt. Bitte korrigieren. Beispiel: andare; gehen';return}
+      if(!parsed.result.length && $('vocabEditor').value.trim()){$('editorMessage').textContent='Keine gültigen Vokabeln gefunden.';return}
+      if(cards.length&&!window.confirm('Die aktuelle Liste ersetzen? Der bisherige Lernfortschritt wird zurückgesetzt.'))return;
+      if(!storageSet(KEY,parsed.result)){alert('Speichern im Browser fehlgeschlagen.');return}
+      useList(parsed.result);$('editorPanel').hidden=true;
+    });
     $('file').addEventListener('change',handleFile);
     $('exportBtn').addEventListener('click',download);
     $('restart').addEventListener('click',()=>{if(window.confirm('Alle Vokabeln wieder in den Stapel legen und den Zähler „Gewusst“ zurücksetzen?'))resetProgress()});
