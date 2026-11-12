@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f8fb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Vokabelkarten">
+  <meta name="description" content="Italienische Vokabeln frei und zufällig abfragen – offline, ohne Anmeldung.">
+  
+  
+  <title>Vokabelkarten · Italiano / Deutsch</title>
+  <style>
+    :root{color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--ink:#1e2b3b;--muted:#617085;--blue:#2959be;--line:#dfe6f0;--surface:#fff;--bg:#f6f8fb}
+    *{box-sizing:border-box}
+    [hidden]{display:none !important}
+    body{margin:0;background:radial-gradient(ellipse 80% 35% at 50% 0%,#e8efff 0%,transparent 100%),var(--bg);color:var(--ink);min-height:100dvh}
+    button,select,textarea{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,select:focus-visible,textarea:focus-visible,.card:focus-visible{outline:3px solid #8bb1ff;outline-offset:3px}
+    .shell{max-width:910px;margin:0 auto;padding:clamp(18px,4vw,34px) clamp(15px,4vw,28px) 46px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .identity{display:flex;align-items:center;gap:12px}
+    .logo{display:grid;place-items:center;width:44px;height:44px;background:#dce8ff;border-radius:13px;color:var(--blue);font-size:24px;font-weight:850;box-shadow:inset 0 0 0 1px #c7d8ff}
+    .head-title{font-size:22px;font-weight:750;letter-spacing:-.5px}
+    .subtitle{font-size:13px;color:var(--muted);margin-top:1px}
+    .pill{background:white;border:1px solid var(--line);padding:9px 13px;border-radius:999px;color:#40516a;font-size:13px;font-weight:650}
+    .top{margin:30px 0 20px;text-align:center}
+    .scoreboard{display:flex;gap:12px;max-width:640px;margin:0 auto 18px}
+    .score{flex:1;background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px 19px;box-shadow:0 4px 16px rgba(46,74,130,.04)}
+    .score span{display:block;color:var(--muted);font-size:13px;font-weight:650}
+    .score strong{display:block;margin-top:5px;font-size:32px;font-variant-numeric:tabular-nums}
+    #remaining{color:#2959be}
+    #known{color:#27794d}
+    h1{font-size:clamp(24px,5vw,34px);margin:0 0 8px;line-height:1.15;letter-spacing:-.8px}
+    .lead{color:var(--muted);margin:0;font-size:15px;line-height:1.5}
+    .settings{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 0 20px}
+    .setting{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+    select{background:#fff;color:var(--ink);border:1px solid var(--line);padding:10px 30px 10px 12px;border-radius:11px;max-width:100%}
+    .deck-card{max-width:640px;margin:0 auto}
+    .card{height:clamp(280px,43vh,400px);perspective:1000px;cursor:pointer;outline:none;touch-action:manipulation;user-select:none;-webkit-tap-highlight-color:transparent}
+    .card-inner{width:100%;height:100%;position:relative;transition:transform .38s cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d}
+    .card.flipped .card-inner{transform:rotateY(180deg)}
+    .face{position:absolute;inset:0;background:#fff;border:1px solid #dfe7f6;border-radius:25px;box-shadow:0 14px 50px rgba(46,74,130,.09),0 4px 12px rgba(46,74,130,.05);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:35px 25px;backface-visibility:hidden;-webkit-backface-visibility:hidden;text-align:center}
+    .back{transform:rotateY(180deg);background:#eef4ff;border-color:#cbdcfa}
+    .eyebrow{color:var(--blue);font-size:12px;text-transform:uppercase;letter-spacing:2px;font-weight:800;position:absolute;top:27px}
+    .term{font-size:clamp(26px,5.5vw,46px);line-height:1.2;overflow-wrap:anywhere;font-weight:700;letter-spacing:-.7px;max-width:100%}
+    .tip{font-size:13px;color:#8492a5;position:absolute;bottom:25px;left:10px;right:10px}
+    .actions{display:flex;gap:12px;margin:19px auto 14px;justify-content:center}
+    .primary,.secondary{border:0;border-radius:15px;min-height:52px;padding:13px 20px;font-weight:700;font-size:15px}
+    .primary{background:var(--blue);color:white;box-shadow:0 7px 20px rgba(41,89,190,.20)}
+    .primary:hover{background:#19499f}
+    .secondary{background:white;color:var(--blue);border:1px solid #cfdaed}
+    .secondary:hover{background:#eef4ff}
+    .actions button{flex:1;max-width:250px}
+    .footnote{text-align:center;color:var(--muted);font-size:13px;line-height:1.45}
+    .panel{max-width:640px;margin:31px auto 0;background:rgba(255,255,255,.83);border:1px solid var(--line);border-radius:20px;padding:19px 22px}
+    .panel-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .panel-title{font-size:15px;font-weight:750;margin:0}
+    .panel-text{font-size:13px;color:var(--muted);line-height:1.6;margin:9px 0 0}
+    .panel-actions{display:flex;gap:7px;flex-wrap:wrap}
+    .small-btn{background:#f5f8fe;border:1px solid #dbe5f4;padding:9px 12px;border-radius:10px;font-weight:650;color:#2959a8;font-size:13px}
+    .small-btn:hover{background:#e8f0ff}
+    .empty{display:flex;min-height:290px;background:#fff;border-radius:24px;border:2px dashed #cbd8ef;align-items:center;justify-content:center;text-align:center;padding:24px;flex-direction:column;gap:9px}
+    .empty-icon{font-size:42px}
+    .empty h2{font-size:22px;margin:0}
+    .empty p{margin:0 0 9px;color:var(--muted);max-width:390px;line-height:1.5;font-size:14px}
+    dialog{border:1px solid #dae3f0;border-radius:20px;padding:0;width:min(690px,calc(100vw - 24px));max-height:calc(100dvh - 36px);box-shadow:0 22px 90px rgba(24,41,72,.25);color:var(--ink)}
+    dialog::backdrop{background:rgba(21,34,53,.46)}
+    .dialog-content{padding:24px;overflow-y:auto;max-height:calc(100dvh - 36px)}
+    .dialog-header{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .dialog-header h2{margin:0;font-size:23px}
+    .close{background:#f1f4f9;border:0;border-radius:10px;padding:7px 12px;font-size:23px;line-height:1}
+    .help{color:var(--muted);font-size:14px;line-height:1.5}
+    code{font-family:ui-monospace,Consolas,monospace;background:#f0f4fa;border-radius:5px;padding:2px 5px;color:#394f74}
+    textarea{display:block;resize:vertical;border-radius:12px;border:1px solid #cbd6e7;background:#fff;color:var(--ink);width:100%;min-height:260px;padding:16px;line-height:1.7;font-size:15px}
+    .dialog-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center;justify-content:space-between}
+    .notice{font-size:13px;color:#8a4c00;margin-top:10px;min-height:20px}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:560px){.shell{padding-top:17px}.top{margin-top:31px}.actions{gap:9px}.actions button{padding:12px 10px}.panel{padding:15px}.panel-head{align-items:flex-start}.setting{flex-direction:column;align-items:flex-start;gap:5px}.settings{gap:14px}.card{height:clamp(280px,43vh,360px)}}
+    @media(prefers-reduced-motion:reduce){.card-inner{transition:none}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="identity"><div class="logo" aria-hidden="true">A↔</div><div><div class="head-title">Vokabelkarten</div><div class="subtitle">Italiano · Deutsch</div></div></div>
+      <div class="pill" id="count">0 Vokabeln</div>
+    </header>
+    <section class="top"><h1>Ein Wort nach dem anderen.</h1><p class="lead">Return: aufdecken und als gewusst bestätigen · Leertaste: später wiederholen.</p></section>
+    <div class="settings">
+      <label class="setting">Abfragerichtung
+        <select id="direction"><option value="de-it">Deutsch → Italienisch</option><option value="it-de">Italienisch → Deutsch</option></select>
+      </label>
+    </div>
+    <div class="scoreboard" aria-live="polite">
+      <div class="score"><span>Noch im Stapel</span><strong id="remaining">0</strong></div>
+      <div class="score"><span>Gewusst</span><strong id="known">0</strong></div>
+    </div>
+    <section class="deck-card" aria-label="Vokabeltraining">
+      <div class="empty" id="empty">
+        <div class="empty-icon" aria-hidden="true">📚</div>
+        <h2>Noch keine Vokabeln</h2>
+        <p>Importiere eine Text-, CSV- oder TSV-Datei, um mit dem Lernen zu beginnen.</p>
+        <button class="primary" id="startEdit">Vokabeldatei importieren</button>
+
+      </div>
+      <div id="training" hidden>
+        <div class="card" id="card" role="button" tabindex="0" aria-label="Vokabelkarte antippen, um Antwort anzuzeigen oder weiterzugehen">
+          <div class="card-inner">
+            <div class="face front"><div class="eyebrow" id="frontLabel">Italiano</div><div class="term" id="frontTerm"></div><div class="tip">Return: Übersetzung zeigen</div></div>
+            <div class="face back"><div class="eyebrow" id="backLabel">Deutsch</div><div class="term" id="backTerm"></div><div class="tip">Return: gewusst · Leertaste: nicht gewusst</div></div>
+          </div>
+        </div>
+        <div class="actions"><button class="secondary" id="unknown">Leertaste · Nicht gewusst</button><button class="primary" id="confirm">Return · Aufdecken</button></div>
+        <div class="footnote" id="status" aria-live="polite">Nicht gewusste Wörter erscheinen später erneut.</div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title">Meine Vokabelliste</h2><div class="panel-actions"><button class="small-btn" id="editBtn">Vokabeln bearbeiten</button><button class="small-btn" id="importBtn">Datei importieren</button><button class="small-btn" id="exportBtn">Exportieren</button><button class="small-btn" id="restart">Training neu starten</button></div></div>
+      <p class="panel-text">Die Vokabelliste startet leer. Du kannst Vokabeln per Datei importieren oder über „Vokabeln bearbeiten“ einfügen und ändern. Alles wird lokal im Browser gespeichert.</p>
+    </section>
+    <section class="panel" id="editorPanel" hidden aria-label="Vokabeln bearbeiten">
+      <div class="panel-head"><h2 class="panel-title">Vokabeln bearbeiten</h2></div>
+      <p class="panel-text">Füge deine Vokabeln per Copy &amp; Paste ein, eine pro Zeile: <strong>Italienisch; Deutsch</strong> (auch Tabulator, Komma oder Gedankenstrich möglich). Du kannst die vorhandenen Einträge hier ändern oder ergänzen.</p>
+      <textarea id="vocabEditor" spellcheck="false" placeholder="andare; gehen&#10;rendersi conto; bemerken"></textarea>
+      <p class="panel-text" id="editorMessage" aria-live="polite"></p>
+      <div class="panel-actions" style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="primary" id="saveEditor">Vokabelliste speichern</button>
+        <button class="secondary" id="cancelEditor">Abbrechen</button>
+      </div>
+    </section>
+    <input class="sr-only" type="file" id="file" accept=".txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values" aria-label="Vokabeldatei auswählen">
+  </main>
+  <script>
+  (() => {
+    'use strict';
+    const KEY='vokabelkarten.cards.importonly.v1';
+    const PROGRESS_KEY='vokabelkarten.progress.importonly.v1';
+    const OPTIONS_KEY='vokabelkarten.settings.v1';
+    const $=id=>document.getElementById(id);
+    let cards=[], remaining=[], known=0, current=-1, revealed=false, showingSample=false, last=-1;
+    function storageGet(key,fallback){try{const s=localStorage.getItem(key);return s===null?fallback:JSON.parse(s)}catch{return fallback}}
+    function storageSet(key,data){try{localStorage.setItem(key,JSON.stringify(data));return true}catch{return false}}
+    function fingerprint(list){return JSON.stringify(list).length+':'+list.length+':'+(list[0]?.join('|')||'')+':'+(list.at(-1)?.join('|')||'')}
+    function saveProgress(){if(!showingSample)storageSet(PROGRESS_KEY,{fingerprint:fingerprint(cards),remaining,known})}
+    function resetProgress(){remaining=cards.map((_,i)=>i);known=0;current=-1;last=-1;revealed=false;saveProgress();chooseNext();render()}
+    function chooseNext(){
+      if(!remaining.length){current=-1;return}
+      const options=remaining.filter(i=>i!==last);
+      const pool=options.length?options:remaining;
+      current=pool[Math.floor(Math.random()*pool.length)];
+      last=current;
+    }
+    function render(){
+      $('count').textContent=cards.length+' Vokabeln'+(showingSample?' · Beispiel':'');
+      $('remaining').textContent=remaining.length;
+      $('known').textContent=known;
+      $('empty').hidden=cards.length>0;
+      $('training').hidden=cards.length===0;
+      $('exportBtn').disabled=cards.length===0;
+      if(!cards.length){$('empty').querySelector('h2').textContent='Noch keine Vokabeln';$('empty').querySelector('p').textContent='Importiere eine Text-, CSV- oder TSV-Datei, um mit dem Lernen zu beginnen.';return}
+      if(!remaining.length){
+        $('training').hidden=true;$('empty').hidden=false;
+        $('empty').querySelector('h2').textContent='Alle Vokabeln geschafft!';
+        $('empty').querySelector('p').textContent='Du hast alle '+known+' Vokabeln als gewusst bestätigt. Über „Training neu starten“ kannst du wieder von vorne beginnen.';
+        $('startEdit').hidden=false;return;
+      }
+      $('startEdit').hidden=false;
+      if(current<0||!remaining.includes(current))chooseNext();
+      const [it,de]=cards[current],reverse=$('direction').value==='de-it';
+      $('frontTerm').textContent=reverse?de:it;
+      $('backTerm').textContent=reverse?it:de;
+      $('frontLabel').textContent=reverse?'Deutsch':'Italiano';
+      $('backLabel').textContent=reverse?'Italiano':'Deutsch';
+      $('card').classList.toggle('flipped',revealed);
+      $('confirm').textContent=revealed?'Return · Gewusst ✓':'Return · Aufdecken';
+      $('status').textContent=revealed?'Return = gewusst und entfernen · Leertaste = später wiederholen':'Return = Übersetzung aufdecken · Leertaste = nicht gewusst';
+    }
+    function confirm(){
+      if(!remaining.length)return;
+      if(!revealed){revealed=true;render();return}
+      remaining=remaining.filter(i=>i!==current);known++;revealed=false;saveProgress();chooseNext();render();
+    }
+    function unknown(){
+      if(!remaining.length)return;
+      revealed=false;saveProgress();chooseNext();render();
+    }
+    function parseLine(line){
+      const s=line.trim().replace(/^[-*•]\s+/,'');
+      if(!s||s.startsWith('#'))return null;
+      let delimiter=null;
+      for(const sep of ['\t',';','|',' — ',' – ',' - '])if(s.includes(sep)){delimiter=sep;break}
+      if(!delimiter&&s.includes(','))delimiter=',';
+      if(!delimiter)return {error:s};
+      let a='',b='',quoted=false,second=false;
+      for(let i=0;i<s.length;i++){
+        const ch=s[i];
+        if(ch==='"'){if(quoted&&s[i+1]==='"'){if(second)b+='"';else a+='"';i++}else quoted=!quoted}
+        else if(!quoted&&!second&&s.startsWith(delimiter,i)){second=true;i+=delimiter.length-1}
+        else if(second)b+=ch;else a+=ch;
+      }
+      a=a.trim();b=b.trim();
+      if(!a||!b)return {error:s};
+      if(['italienisch','italiano','italian','it'].includes(a.toLowerCase())&&['deutsch','tedesco','german','de'].includes(b.toLowerCase()))return null;
+      return [a,b];
+    }
+    function parseText(text){
+      const result=[],invalid=[];
+      for(const line of text.replace(/^\uFEFF/,'').split(/\r?\n/)){
+        const p=parseLine(line);if(!p)continue;if(p.error)invalid.push(p.error);else result.push(p);
+      }
+      return {result,invalid};
+    }
+    function useList(list){cards=list;showingSample=false;resetProgress()}
+    function openEditor(){
+      $('vocabEditor').value=cards.map(([it,de])=>it+'; '+de).join('\n');
+      $('editorMessage').textContent='';
+      $('editorPanel').hidden=false;
+      $('editorPanel').scrollIntoView({behavior:'smooth',block:'start'});
+      $('vocabEditor').focus();
+    }
+    function download(){
+      const content='\uFEFF'+cards.map(([it,de])=>it+'; '+de).join('\n')+'\n';
+      const url=URL.createObjectURL(new Blob([content],{type:'text/plain;charset=utf-8'}));
+      const a=document.createElement('a');a.href=url;a.download='meine-italienisch-vokabeln.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+    async function handleFile(event){
+      const file=event.target.files?.[0];if(!file)return;
+      try{
+        const parsed=parseText(await file.text());
+        if(!parsed.result.length){alert('Keine Vokabeln gefunden.');return}
+        if(parsed.invalid.length&&!window.confirm(parsed.invalid.length+' Zeilen nicht erkannt. Nur die '+parsed.result.length+' erkannten Wörter laden?'))return;
+        storageSet(KEY,parsed.result);useList(parsed.result)
+      }catch(e){alert('Datei konnte nicht gelesen werden: '+e.message)}finally{event.target.value=''}
+    }
+    $('card').addEventListener('click',confirm);
+    $('confirm').addEventListener('click',confirm);
+    $('unknown').addEventListener('click',unknown);
+    $('direction').addEventListener('change',()=>{revealed=false;storageSet(OPTIONS_KEY,{direction:$('direction').value});render()});
+    $('startEdit').addEventListener('click',openEditor);
+    $('importBtn').addEventListener('click',()=>$('file').click());
+    $('editBtn').addEventListener('click',openEditor);
+    $('cancelEditor').addEventListener('click',()=>{$('editorPanel').hidden=true});
+    $('saveEditor').addEventListener('click',()=>{
+      const parsed=parseText($('vocabEditor').value);
+      if(parsed.invalid.length){$('editorMessage').textContent=parsed.invalid.length+' Zeile(n) nicht erkannt. Bitte korrigieren. Beispiel: andare; gehen';return}
+      if(!parsed.result.length && $('vocabEditor').value.trim()){$('editorMessage').textContent='Keine gültigen Vokabeln gefunden.';return}
+      if(cards.length&&!window.confirm('Die aktuelle Liste ersetzen? Der bisherige Lernfortschritt wird zurückgesetzt.'))return;
+      if(!storageSet(KEY,parsed.result)){alert('Speichern im Browser fehlgeschlagen.');return}
+      useList(parsed.result);$('editorPanel').hidden=true;
+    });
+    $('file').addEventListener('change',handleFile);
+    $('exportBtn').addEventListener('click',download);
+    $('restart').addEventListener('click',()=>{if(window.confirm('Alle Vokabeln wieder in den Stapel legen und den Zähler „Gewusst“ zurücksetzen?'))resetProgress()});
+    document.addEventListener('keydown',e=>{
+      if(e.altKey||e.ctrlKey||e.metaKey||e.repeat||['SELECT','INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();if(e.key==='Enter')confirm();else unknown()}
+    });
+    const stored=storageGet(KEY,null);
+    cards=Array.isArray(stored)?stored.filter(c=>Array.isArray(c)&&c.length===2&&typeof c[0]==='string'&&typeof c[1]==='string'&&c[0]&&c[1]):[];
+    const opts=storageGet(OPTIONS_KEY,{});
+    if(opts.direction==='it-de')$('direction').value='it-de';
+    const progress=storageGet(PROGRESS_KEY,null);
+    if(progress&&progress.fingerprint===fingerprint(cards)&&Array.isArray(progress.remaining)&&progress.remaining.every(i=>Number.isInteger(i)&&i>=0&&i<cards.length)&&new Set(progress.remaining).size===progress.remaining.length&&progress.known===cards.length-progress.remaining.length){
+      remaining=progress.remaining;known=progress.known;chooseNext();render();
+    }else resetProgress();
+  })();
+  </script>
+</body>
+</html>
